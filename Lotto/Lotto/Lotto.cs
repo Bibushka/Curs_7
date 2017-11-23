@@ -24,16 +24,22 @@ namespace Lotto
         public int[] InsertNewNumber(int[] originalLine, int number)
         {
             int temp;
+            int ok;
             Array.Resize(ref originalLine, originalLine.Length + 1);
             originalLine[originalLine.Length - 1] = number;
-            for (int i = 0; i < originalLine.Length; i++)
+            do
+            {
+                ok = 1;
                 for (int j = 0; j < originalLine.Length - 1; j++)
                     if (originalLine[j] > originalLine[j + 1])
                     {
                         temp = originalLine[j + 1];
                         originalLine[j + 1] = originalLine[j];
                         originalLine[j] = temp;
+                        ok = 0;
                     }
+            }
+            while (ok != 0);
             return originalLine;
         }
     }
