@@ -3,53 +3,74 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Priorities
 {
+    public enum TypesOfPriorities
+    {
+        High = 1,
+        Medium = 2,
+        Low = 4,
+    }
+
+    public struct Product
+    {
+        public TypesOfPriorities priority;
+        public string description;
+
+        public Product(TypesOfPriorities priority, string description)
+        {
+            this.priority = priority;
+            this.description = description;
+        }
+    }
+
     [TestClass]
     public class Priorities
     {
         [TestMethod]
         public void TestMethod1()
         {
-            string[] original = new string[] { "M", "L", "M", "L", "H", "L", "M", "H", "M" };
-            string[] result = new string[] { "H", "H", "M", "M", "M", "M", "L", "L", "L" };
-            CollectionAssert.AreEqual(result, SortPriority(original));
+            Product samsung = new Product (TypesOfPriorities.High, "bad condition");
+            Product iPhone = new Product (TypesOfPriorities.High, "cracked display");
+            Product LG = new Product (TypesOfPriorities.Low, "needs screen protection");
+            Product huawei = new Product (TypesOfPriorities.Medium, "battery replacement");
+            TypesOfPriorities[] result = new TypesOfPriorities[] { TypesOfPriorities.High,
+                TypesOfPriorities.High, TypesOfPriorities.Medium, TypesOfPriorities.Low };
+            Product[] cases = new Product[] { samsung, iPhone, LG, huawei };
+            CollectionAssert.AreEqual(result, SortPriority(cases));
         }
 
-        public string[] SortPriority(string[] originalString)
+        public TypesOfPriorities[] SortPriority(Product[] cases)
         {
-            return NumbersToLetters(OrderNumbers(LettersToNumbers(originalString), 0, originalString.Length-1));
+            int[] levelsOfPriority = ConvertEnumToInt(cases);
+            levelsOfPriority = OrderNumbers(levelsOfPriority, 0, levelsOfPriority.Length-1);
+            return ConvertIntToEnum(levelsOfPriority);
         }
 
-        public int[] LettersToNumbers(string[] originalString)
+        public int[] ConvertEnumToInt(Product[] cases)
         {
-            int[] originalInt = new int[originalString.Length];
-            for (int i = 0; i < originalString.Length; i++)
-                switch (originalString[i])
+            int[] ints = new int[0];
+            for (int i = 0; i < cases.Length; i++)
+                ints[i] = (int)cases[i].priority;
+            return ints;
+        }
+
+        public TypesOfPriorities[] ConvertIntToEnum(int[] levelsOfPriority)
+        {
+            TypesOfPriorities[] enums = new TypesOfPriorities[0];
+            for(int i = 0; i < levelsOfPriority.Length; i++)
+                switch (levelsOfPriority[i])
                 {
-                    case "H": originalInt[i] = 1; break;
-                    case "M": originalInt[i] = 2; break;
-                    case "L": originalInt[i] = 3; break;
+                    case 1: enums[i] = TypesOfPriorities.High; break;
+                    case 2: enums[i] = TypesOfPriorities.Medium; break;
+                    case 4: enums[i] = TypesOfPriorities.Low; break;
                 }
-            return originalInt;
-        }
-
-        public string[] NumbersToLetters(int[] originalInt)
-        {
-            string[] originalString = new string[originalInt.Length];
-            for (int i = 0; i < originalInt.Length; i++)
-                switch (originalInt[i])
-                {
-                    case 1: originalString[i] = "H"; break;
-                    case 2: originalString[i] = "M"; break;
-                    case 3: originalString[i] = "L"; break;
-                }
-            return originalString;
+            return enums;
         }
 
         [TestMethod]
         public void OrderTest()
         {
-            int[] numbers = new int[] { 2, 1, 2, 0, 3 };
-            CollectionAssert.AreEqual(new int[] { 0, 1, 2, 2, 3 }, OrderNumbers(numbers, 0, numbers.Length-1));
+            int[] numbers = new int[] { 2, 2, 0, 3, 5, 0, 7};
+            CollectionAssert.AreEqual(new int[] { 0, 0, 2, 2, 3, 5, 7 }, OrderNumbers(numbers, 0, numbers.Length - 1));
         }
 
         public int[] OrderNumbers(int[] original, int i, int j)
@@ -59,12 +80,12 @@ namespace Priorities
             int temp;
             int first = i;
             int last = j;
-            int middle = (first + last) / 2;
+            int middle = original[(first + last) / 2];
             while (first <= last)
             {
-                while (original[first] < original[middle])
+                while (original[first].CompareTo(middle) < 0)
                     first++;
-                while (original[last] > original[middle])
+                while (original[last].CompareTo(middle) > 0)
                     last--;
                 if (first <= last)
                 {
@@ -84,7 +105,7 @@ namespace Priorities
             {
                 return OrderNumbers(original, first, i);
             }
-            return original;
+            return OrderNumbers(original, first, last);
         }
     }
 }
