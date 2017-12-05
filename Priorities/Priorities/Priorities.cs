@@ -75,12 +75,12 @@ namespace Priorities
 
         public int[] OrderNumbers(int[] original, int i, int j)
         {
-            if (j == 0)
+            if (ExitCondition(original))
                 return original;
             int temp;
             int first = i;
             int last = j;
-            int middle = original[(first + last) / 2];
+            int middle = original[((first + last) / 2)+1];
             while (first <= last)
             {
                 while (original[first].CompareTo(middle) < 0)
@@ -100,12 +100,22 @@ namespace Priorities
             {
                 return OrderNumbers(original, j, last);
             }
-
             if (first < i)
             {
                 return OrderNumbers(original, first, i);
             }
-            return OrderNumbers(original, first, last);
+            return OrderNumbers(original, i, j);
+        }
+
+        public bool ExitCondition(int[] original)
+        {
+            int ok = 0;
+            for (int i = 0; i < original.Length - 2; i++)
+                if (original[i] > original[i + 1])
+                    ok = 1;
+            if (ok == 1)
+                return false;
+            return true;
         }
     }
 }
